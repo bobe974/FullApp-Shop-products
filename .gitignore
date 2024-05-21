@@ -1,0 +1,6 @@
+# Fichier à ignorer
+.DS_Store
+node_modules/
+front/.angular/
+
+
