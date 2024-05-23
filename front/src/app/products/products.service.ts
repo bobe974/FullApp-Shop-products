@@ -7,7 +7,7 @@ import { Product } from './product.class';
   providedIn: 'root'
 })
 export class ProductsService {
-
+//TODO changer la source de données de l'application web: fichier json -> API REST
     private static productslist: Product[] = null;
     private products$: BehaviorSubject<Product[]> = new BehaviorSubject<Product[]>([]);
 
@@ -16,9 +16,9 @@ export class ProductsService {
     getProducts(): Observable<Product[]> {
         if( ! ProductsService.productslist )
         {
-            this.http.get<any>('assets/products.json').subscribe(data => {
+            this.http.get<any>('http://localhost:3000/api/products').subscribe(data => {
                 ProductsService.productslist = data.data;
-                
+
                 this.products$.next(ProductsService.productslist);
             });
         }
@@ -32,11 +32,14 @@ export class ProductsService {
 
     create(prod: Product): Observable<Product[]> {
 
-        ProductsService.productslist.push(prod);
-        this.products$.next(ProductsService.productslist);
-        
-        return this.products$;
+        //ProductsService.productslist.push(prod);
+        //this.products$.next(ProductsService.productslist);
+        //return this.products$;
+        const apiUrl = 'http://localhost:3000/api/products';
+        console.log('Envoi du JSON:', JSON.stringify(prod));
+        return this.http.post<Product[]>(apiUrl, prod);
     }
+    
 
     update(prod: Product): Observable<Product[]>{
         ProductsService.productslist.forEach(element => {
