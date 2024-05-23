@@ -41,30 +41,47 @@ export class ProductsService {
     }
     
 
-    update(prod: Product): Observable<Product[]>{
-        ProductsService.productslist.forEach(element => {
-            if(element.id == prod.id)
-            {
-                element.name = prod.name;
-                element.category = prod.category;
-                element.code = prod.code;
-                element.description = prod.description;
-                element.image = prod.image;
-                element.inventoryStatus = prod.inventoryStatus;
-                element.price = prod.price;
-                element.quantity = prod.quantity;
-                element.rating = prod.rating;
-            }
+    update(prod: Product): Observable<Product[]> {
+        const apiUrl = `http://localhost:3000/api/products/${prod.id}`;
+        console.log('Envoi du JSON pour mise à jour:', JSON.stringify(prod));
+        
+        return new Observable(observer => {
+            this.http.patch<Product>(apiUrl, prod).subscribe(
+                updatedProduct => {
+                    const index = ProductsService.productslist.findIndex(element => element.id === prod.id);
+                    if (index !== -1) {
+                        ProductsService.productslist[index] = updatedProduct;
+                        this.products$.next(ProductsService.productslist);
+                    }
+                    observer.next(ProductsService.productslist);
+                    observer.complete();
+                },
+                error => {
+                    observer.error(error);
+                }
+            );
         });
-        this.products$.next(ProductsService.productslist);
-
-        return this.products$;
     }
+    
 
 
-    delete(id: number): Observable<Product[]>{
-        ProductsService.productslist = ProductsService.productslist.filter(value => { return value.id !== id } );
-        this.products$.next(ProductsService.productslist);
-        return this.products$;
+    delete(id: number): Observable<Product[]> {
+        const apiUrl = `http://localhost:3000/api/products/${id}`;
+        console.log('Suppression du produit avec l\'ID:', id);
+    
+        return new Observable(observer => {
+            this.http.delete(apiUrl).subscribe(
+                () => {
+                    ProductsService.productslist = ProductsService.productslist.filter(product => product.id !== id);
+                    this.products$.next(ProductsService.productslist);
+                    observer.next(ProductsService.productslist);
+                    observer.complete();
+                },
+                error => {
+                    observer.error(error);
+                }
+            );
+        });
     }
+    
 }
