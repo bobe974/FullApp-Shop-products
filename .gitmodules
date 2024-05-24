@@ -1,0 +1,3 @@
+[submodule "front/back"]
+	path = front/back
+	url = https://github.com/bobe974/product-backend-Ashop.git
